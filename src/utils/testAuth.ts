@@ -1,0 +1,50 @@
+import Cookies from 'js-cookie';
+
+// Test function to set authentication tokens manually
+export const setTestAuthTokens = () => {
+  const testTokens = {
+    access_token: "eyJraWQiOiJIeDBuUkhIR0orSW9qNVFCVWxRS2ROMUVTcWJVMWVXeGVMTXB5cE41c1Z3PSIsImFsZyI6IlJTMjU2In0.eyJzdWIiOiI3NDg4MTQyOC0wMDYxLTcwNjUtYzJjZS0xYmVjZGFkYzliMzEiLCJpc3MiOiJodHRwczpcL1wvY29nbml0by1pZHAudXMtZWFzdC0xLmFtYXpvbmF3cy5jb21cL3VzLWVhc3QtMV9HTmxQb3dwS3kiLCJjbGllbnRfaWQiOiIzYWwwMDhwNzlqY2o2NTlxcW1yNzg2cmQxYiIsIm9yaWdpbl9qdGkiOiI4OWNmYzM2Yi1jODU2LTRjN2EtYmM1Yi01ZDM0NzAxY2FjYzEiLCJldmVudF9pZCI6IjZhMGZhMjM1LTY2NjgtNDg5Ni1hYmRkLWY1MDYyN2Q2NGMxMiIsInRva2VuX3VzZSI6ImFjY2VzcyIsInNjb3BlIjoiYXdzLmNvZ25pdG8uc2lnbmluLnVzZXIuYWRtaW4iLCJhdXRoX3RpbWUiOjE3NTUwODUwODEsImV4cCI6MTc1NTA4ODY4MSwiaWF0IjoxNzU1MDg1MDgxLCJqdGkiOiIyNTRlOGRjZS1kYzlkLTRhMDktOGQ4NS0wYzYwM2EzNzdkOTkiLCJ1c2VybmFtZSI6Ijc0ODgxNDI4LTAwNjEtNzA2NS1jMmNlLTFiZWNkYWRjOWIzMSJ9.gQnOSwe_Mcm_PtMeCTB9spixv5HcpdGF81SGkauNqn2eCLKrKQJxMnH6djuSyt5aM0YJlIvJhvi0QaAqw4im1YhKiAz4Z-NWs5SfGumUsk3QjuP1h-VsaRbWYfgMXAkGT_vuj0Eqt4V8bbASnX1USCG2N3bCEXsTNfRrnwz2PHlRJCctaOBIq-U9bbEVc-TES9cHXaXUOg42L0hNm9XHsixptKk7L4WAtAnFlTeFeIvkGiI1lbDRXFf1pHSy-LwY4eUFodKvI6tSYPk6_Hyuzdw0LE0eW40bzCAn2J_25PnNGu1ByMwLIdqaEaIPr7ZTq26Y_TcsBXLnHy_sg9VKpg",
+    refresh_token: "eyJjdHkiOiJKV1QiLCJlbmMiOiJBMjU2R0NNIiwiYWxnIjoiUlNBLU9BRVAifQ.ccHPXQ-tn6atRdZAg6yCgapk9IIfhYGvnwT19fHG5emiFyXBcI9f0NNbRxOCwJCv8qQJdLpW0PvdGqlWiJjaXYO13DgYkpePHPqaL8J7jXFlMBXynsN0xnX3IYUIEDPc18z8rvLzQFxd0bVmTr65Tsl1KNx-dfVEVvmpXbzuQ8a3dzCbp4viLJcWasaej6AQBJzCxTB4aPE9UOGYV4MUSF1bnDnbe7p0G__awjcKpBUc1fJR91zKXBRH4rwCodKTLcQDJLBxhM8ig9DvttaR14ghNWAW4ifoVeJdzHx2rb3aae-KFOMidVpd0Q2OcitOgjFcl9t3meNiJqV-F7tSZA.rV8GfC7_S04RA3sl.kZdp9XR1u6tUTLT-_3iZrfh1HMvazizDlmhV0vBVL99al87sHzQeZ_Ma8Fksu9-0CQgAJTF3hRFzO_Kp2bEDY330IUerMNmVomTqFdwhRoPPgK-BlHWweRhb3sCsdoJZTfLKoc8dIX2exi83z69XAszZoBU1dpTuhC6GvVdX7nHv-D6ogYcqYFRX420vew3nKdXg4_3eHWJDiudE_6RnNN2BNFKSSwajflFQ9A0iIPjz3kx-u5Lvl2CO-943ElTqDO1lyUv15TEgrQnXb-_pse6631erI8xiRawHoFSLYzq4AyCo3q-G7CmFIA3VefRG0QsGYRAs6nQgy6e1Ve3jQbqullrU4csMovks4pAVPv0wyIDa_Dm86AeTRi5L4fOybPCllDQq3x3E4Sy_SarQB9VBg7NNqHfsxqSNRB-vPTJvnJc_yEr8wCNZvCrsMjWxVwQofGlludqkbv5ZjVyMIs_32yd7Dw2epswxh9A7kU1xCEIct3uTXXgXEuBYvGdi6fQCV2DT2sfxKsxqur8N6UIV59B5R3wXVffBqQ7kDuad6VLB1S-Y0tnhwEed1JQP9wQrZ7CkSTavtXAlFEpjGn3NGTo5XQmEcX3qqDcM_VJumi5Cck6O5sXrPY8tvxLoIEBCslvwKuBjCmO6Fg9lBr_XIygjtDyr8RVAvgUd9_CtIbQ9uOtMTF9HClsCTflq5B0uAJQuTDJ_s7t7G9nQ0qA7PErttzq0FwjDrtfckHmjEqA7SgJUMMGlK1qoX3oEL1mb79QaqdbyAAXtOvdaZcfKaeot4i8E36eClS2NQkNrG40lpiI3ySSnPpq6QKpqjvD1id2x-9yJdueeH0uWndqq07PfivYGBIjVQqA3q9eRGwzHBYd-aCCBiKnqsRqqCfbLq7bkui_PXA9DfFcYAIosiYYkV0fqv5BZYXDMoxJdugVDFLy44UCVQJrSJ8Gv6f5b2384HwR4ZzkE5fEEGQ3DEHBsheQ90KN3seOTo--Eyby99d2Ql844j9GsTWkA2ZxGWgH_Poq6mz43BkehpQ4hNcoHXuo5phEGvFLI8-1xpYq7uTUauVrelaAL-6AK296UnLejpog1gyixD6oZ-Y70g2lzGM5Xd9gQTwXh7VxOzFQFIjyC_tNnsuXmR_tDoIYKD8v1NIUdSnQiPwUiody_hYOFz3nfcxLUMShZF9yLZu1hfIwhtWcygCN-js7P53rhsM39zw9iRX2LKyRQk3oofY-bQh3U_fpsZYBqD_jk49xo-dbIojCMThZQwL3OlISIm3474n46P-Giim4ffv5jTYKiqhGWZ_yzmJvuGOBaQM4BSKHYp1fxWg.w4pGXBUFAeuz9pGkhMWdFg",
+    id_token: "eyJraWQiOiJWbVFYWnM1SnFCaTVDd3VnZHpGXC9UZjg3ZkJqMGRzT0JaaEVwYUNBZ2NKRT0iLCJhbGciOiJSUzI1NiJ9.eyJzdWIiOiI3NDg4MTQyOC0wMDYxLTcwNjUtYzJjZS0xYmVjZGFkYzliMzEiLCJpc3MiOiJodHRwczpcL1wvY29nbml0by1pZHAudXMtZWFzdC0xLmFtYXpvbmF3cy5jb21cL3VzLWVhc3QtMV9HTmxQb3dwS3kiLCJjb2duaXRvOnVzZXJuYW1lIjoiNzQ4ODE0MjgtMDA2MS03MDY1LWMyY2UtMWJlY2RhZGM5YjMxIiwib3JpZ2luX2p0aSI6Ijg5Y2ZjMzZiLWM4NTYtNGM3YS1iYzViLTVkMzQ3MDFjYWNjMSIsImF1ZCI6IjNhbDAwOHA3OWpjajY1OXFxbXI3ODZyZDFiIiwiZXZlbnRfaWQiOiI2YTBmYTIzNS02NjY4LTQ4OTYtYWJkZC1mNTA2MjdkNjRjMTIiLCJ0b2tlbl91c2UiOiJpZCIsImF1dGhfdGltZSI6MTc1NTA4NTA4MSwiZXhwIjoxNzU1MDg4NjgxLCJpYXQiOjE3NTUwODUwODEsImp0aSI6IjRhYjUxZmFmLWI3YjYtNDQ3Ni04OWZiLTliZjU2YjRiNjcwMiIsImVtYWlsIjoidWlfZGV2X3VzZXJAc3B5Z2xhei5jb20ifQ.m5CH_zBuEzqL-WjCTfbxY-ZaiZjrvQoxho4JEHtIi1DqRr1PTwgzy6r4RxFT1yXxoi8ItfIwdX9oBtaxdWHLkzw1GOqST4Lodw5KvdQYQsf2HhFZLQWUk3jDAwzvRNartQwgGfWfmnJcudUrCuxmyXJu5dipTcvaSKC2yMakRju-mHG0cmduUCOw_V8DSGLe6OsKwSAPk3T0lVShiRoXIvAcJ_x44ztrWphXMCKvIuipa82RFdfqGQC2BaK272jrMtcqN9S2pGPeez8lH16ndhrh9JHM_vIhVK5ACDGM4eEGcfFPnVjCYL3FYhLhj6mBIk1qJcAAnu4TSSEiJSx6JQ",
+    user_id: "ui_dev_user@spyglaz.com"
+  };
+
+  // Validate tokens before setting them
+  if (!testTokens.access_token || !testTokens.user_id ||
+    typeof testTokens.access_token !== 'string' ||
+    typeof testTokens.user_id !== 'string') {
+    console.error('Invalid test tokens provided');
+    return null;
+  }
+
+  // Set tokens in cookies
+  Cookies.set('access_token', testTokens.access_token, { expires: 1 });
+  Cookies.set('refresh_token', testTokens.refresh_token, { expires: 30 });
+  Cookies.set('id_token', testTokens.id_token, { expires: 1 });
+  Cookies.set('user_id', testTokens.user_id, { expires: 30 });
+
+
+
+  return testTokens;
+};
+
+// Function to clear test tokens
+export const clearTestAuthTokens = () => {
+  Cookies.remove('access_token');
+  Cookies.remove('refresh_token');
+  Cookies.remove('id_token');
+  Cookies.remove('user_id');
+
+};
+
+// Function to check current auth state
+export const checkAuthState = () => {
+  const tokens = {
+    access_token: Cookies.get('access_token'),
+    refresh_token: Cookies.get('refresh_token'),
+    id_token: Cookies.get('id_token'),
+    user_id: Cookies.get('user_id'),
+  };
+
+  return tokens;
+};

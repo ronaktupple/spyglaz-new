@@ -1,0 +1,452 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Definition of the design system. All colors, gradients, fonts, etc should be defined here. 
+All colors MUST be HSL.
+*/
+
+@layer base {
+  :root {
+    /* Professional SaaS color palette */
+    --background: 0 0% 100%;
+    --foreground: 210 24% 16%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 210 24% 16%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 210 24% 16%;
+
+    /* Deep blue primary for trust/professionalism */
+    --primary: 213 94% 25%;
+    --primary-foreground: 0 0% 98%;
+    --primary-glow: 213 94% 35%;
+
+    /* Soft neutral secondary */
+    --secondary: 210 16% 96%;
+    --secondary-foreground: 210 24% 16%;
+
+    /* Subtle muted tones */
+    --muted: 210 12% 97%;
+    --muted-foreground: 210 12% 52%;
+
+    /* Teal accent for actions */
+    --accent: 180 84% 42%;
+    --accent-foreground: 0 0% 98%;
+    --accent-glow: 180 84% 52%;
+
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 98%;
+
+    --border: 210 12% 90%;
+    --input: 210 12% 95%;
+    --ring: 213 94% 25%;
+
+    /* Professional gradients */
+    --gradient-primary: linear-gradient(135deg, hsl(213 94% 25%), hsl(213 94% 35%));
+    --gradient-accent: linear-gradient(135deg, hsl(180 84% 42%), hsl(180 84% 52%));
+    --gradient-soft: linear-gradient(180deg, hsl(210 16% 98%), hsl(210 12% 97%));
+    --gradient-chat-user: linear-gradient(135deg, hsl(210 8% 88%), hsl(210 8% 92%));
+    
+    /* Professional shadows */
+    --shadow-elegant: 0 10px 30px -10px hsl(213 94% 25% / 0.2);
+    --shadow-glow: 0 0 40px hsl(213 94% 35% / 0.3);
+    --shadow-soft: 0 2px 20px -5px hsl(210 12% 52% / 0.15);
+
+    /* Smooth transitions */
+    --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-fast: all 0.15s ease-out;
+    --transition-bounce: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+
+    --radius: 0.5rem;
+
+    --sidebar-background: 0 0% 98%;
+
+    --sidebar-foreground: 240 5.3% 26.1%;
+
+    --sidebar-primary: 240 5.9% 10%;
+
+    --sidebar-primary-foreground: 0 0% 98%;
+
+    --sidebar-accent: 240 4.8% 95.9%;
+
+    --sidebar-accent-foreground: 240 5.9% 10%;
+
+    --sidebar-border: 220 13% 91%;
+
+    --sidebar-ring: 217.2 91.2% 59.8%;
+  }
+
+  .dark {
+    --background: 222.2 84% 4.9%;
+    --foreground: 210 40% 98%;
+
+    --card: 222.2 84% 4.9%;
+    --card-foreground: 210 40% 98%;
+
+    --popover: 222.2 84% 4.9%;
+    --popover-foreground: 210 40% 98%;
+
+    /* Bright primary for dark mode */
+    --primary: 213 94% 68%;
+    --primary-foreground: 222.2 84% 4.9%;
+    --primary-glow: 213 94% 78%;
+
+    --secondary: 217.2 32.6% 17.5%;
+    --secondary-foreground: 210 40% 98%;
+
+    --muted: 217.2 32.6% 17.5%;
+    --muted-foreground: 215 20.2% 65.1%;
+
+    /* Bright accent for dark mode */
+    --accent: 180 84% 62%;
+    --accent-foreground: 222.2 84% 4.9%;
+    --accent-glow: 180 84% 72%;
+
+    --destructive: 0 62.8% 50.6%;
+    --destructive-foreground: 210 40% 98%;
+
+    --border: 217.2 32.6% 17.5%;
+    --input: 217.2 32.6% 17.5%;
+    --ring: 213 94% 68%;
+
+    /* Dark mode gradients */
+    --gradient-primary: linear-gradient(135deg, hsl(213 94% 68%), hsl(213 94% 78%));
+    --gradient-accent: linear-gradient(135deg, hsl(180 84% 62%), hsl(180 84% 72%));
+    --gradient-soft: linear-gradient(180deg, hsl(217.2 32.6% 17.5%), hsl(217.2 32.6% 15.5%));
+    --gradient-chat-user: linear-gradient(135deg, hsl(217.2 32.6% 22%), hsl(217.2 32.6% 26%));
+    
+    /* Dark mode shadows */
+    --shadow-elegant: 0 10px 30px -10px hsl(213 94% 68% / 0.3);
+    --shadow-glow: 0 0 40px hsl(213 94% 78% / 0.4);
+    --shadow-soft: 0 2px 20px -5px hsl(0 0% 0% / 0.3);
+
+    --sidebar-background: 240 5.9% 10%;
+    --sidebar-foreground: 240 4.8% 95.9%;
+    --sidebar-primary: 213 94% 68%;
+    --sidebar-primary-foreground: 240 5.9% 10%;
+    --sidebar-accent: 240 3.7% 15.9%;
+    --sidebar-accent-foreground: 240 4.8% 95.9%;
+    --sidebar-border: 240 3.7% 15.9%;
+    --sidebar-ring: 213 94% 68%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+  }
+
+  /* Custom slim scrollbar */
+  /* * {
+    scrollbar-width: thin;
+    scrollbar-color: hsl(var(--border)) transparent;
+  } */
+
+  *::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+
+  *::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  *::-webkit-scrollbar-thumb {
+    background-color: hsl(var(--border));
+    border-radius: 3px;
+    transition: background-color 0.2s ease;
+  }
+
+  *::-webkit-scrollbar-thumb:hover {
+    background-color: hsl(var(--muted-foreground));
+  }
+
+  *::-webkit-scrollbar-corner {
+    background: transparent;
+  }
+
+  /* Hide scrollbar but keep scrollability */
+  .hide-scrollbar {
+    scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none;  /* IE and Edge */
+  }
+
+  .hide-scrollbar::-webkit-scrollbar {
+    display: none; /* Chrome, Safari, Opera */
+  }
+}
+
+@layer components {
+  /* Animation utility classes */
+  .hover-scale {
+    @apply transition-transform duration-200 hover:scale-105;
+  }
+  
+  .hover-lift {
+    @apply transition-all duration-300 hover:-translate-y-1 hover:shadow-elegant;
+  }
+  
+  .fade-in-up {
+    @apply animate-fade-in;
+  }
+  
+  .pulse-glow {
+    @apply animate-glow-pulse;
+  }
+  
+  .bounce-gentle {
+    @apply animate-bounce-gentle;
+  }
+  
+  /* Interactive link animation */
+  .animated-link {
+    @apply relative inline-block after:content-[''] after:absolute after:w-full after:scale-x-0 after:h-0.5 after:bottom-0 after:left-0 after:bg-primary after:origin-bottom-right after:transition-transform after:duration-300 hover:after:scale-x-100 hover:after:origin-bottom-left;
+  }
+  
+  /* Card hover effects */
+  .card-hover {
+    @apply transition-all duration-300 hover:shadow-glow hover:-translate-y-1 hover:scale-[1.02];
+  }
+  
+  /* Button animations */
+  .btn-animate {
+    @apply transition-all duration-200 hover:shadow-glow active:scale-95;
+  }
+  
+  /* Liquid glass morphism effect */
+  .liquid-glass {
+    @apply bg-white/10 backdrop-blur-xl border border-white/20 
+           shadow-[0_8px_32px_rgba(0,0,0,0.1)] 
+           before:absolute before:inset-0 before:rounded-[inherit] 
+           before:bg-gradient-to-br before:from-white/20 before:to-transparent 
+           before:pointer-events-none relative overflow-hidden;
+  }
+  
+  .liquid-glass::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, 
+      transparent, 
+      rgba(255,255,255,0.1), 
+      transparent
+    );
+    animation: shimmer 3s infinite;
+    pointer-events: none;
+  }
+  
+  @keyframes shimmer {
+    0% { left: -100%; }
+    100% { left: 100%; }
+  }
+  
+  /* Golden Moment Animations */
+  /* @keyframes golden-glow {
+    0%, 100% { 
+      box-shadow: 0 0 20px rgba(255, 215, 0, 0.3),
+                 0 0 40px rgba(255, 215, 0, 0.2),
+                 0 0 60px rgba(255, 215, 0, 0.1);
+    }
+    50% { 
+      box-shadow: 0 0 30px rgba(255, 215, 0, 0.5),
+                 0 0 60px rgba(255, 215, 0, 0.3),
+                 0 0 90px rgba(255, 215, 0, 0.2);
+    }
+  } */
+  
+  @keyframes confetti-fall {
+    0% {
+      transform: translateY(-100vh) rotate(0deg);
+      opacity: 1;
+    }
+    100% {
+      transform: translateY(100vh) rotate(720deg);
+      opacity: 0;
+    }
+  }
+  
+  @keyframes trophy-bounce {
+    0%, 100% { 
+      transform: scale(1) translateY(0); 
+      transform-origin: center center;
+    }
+    25% { 
+      transform: scale(1.1) translateY(-10px); 
+      transform-origin: center center;
+    }
+    50% { 
+      transform: scale(1.05) translateY(-5px); 
+      transform-origin: center center;
+    }
+    75% { 
+      transform: scale(1.08) translateY(-8px); 
+      transform-origin: center center;
+    }
+  }
+  
+  .golden-glow {
+    animation: golden-glow 2s ease-in-out infinite;
+  }
+  
+  .confetti-fall {
+    animation: confetti-fall 3s linear infinite;
+  }
+  
+  .trophy-bounce {
+    animation: trophy-bounce 2s ease-in-out infinite;
+    transform-origin: center center;
+  }
+}
+
+@layer utilities {
+  /* Custom breakpoint utilities */
+  .xs\:inline {
+    @media (min-width: 475px) {
+      display: inline;
+    }
+  }
+  
+  .xs\:hidden {
+    @media (min-width: 475px) {
+      display: none;
+    }
+  }
+  
+  .xs\:block {
+    @media (min-width: 475px) {
+      display: block;
+    }
+  }
+  
+  .xs\:flex {
+    @media (min-width: 475px) {
+      display: flex;
+    }
+  }
+  
+  .xs\:grid {
+    @media (min-width: 475px) {
+      display: grid;
+    }
+  }
+  
+  .xs\:text-sm {
+    @media (min-width: 475px) {
+      font-size: 0.875rem;
+      line-height: 1.25rem;
+    }
+  }
+  
+  .xs\:text-base {
+    @media (min-width: 475px) {
+      font-size: 1rem;
+      line-height: 1.5rem;
+    }
+  }
+  
+  .xs\:text-lg {
+    @media (min-width: 475px) {
+      font-size: 1.125rem;
+      line-height: 1.75rem;
+    }
+  }
+  
+  .xs\:px-4 {
+    @media (min-width: 475px) {
+      padding-left: 1rem;
+      padding-right: 1rem;
+    }
+  }
+  
+  .xs\:py-2 {
+    @media (min-width: 475px) {
+      padding-top: 0.5rem;
+      padding-bottom: 0.5rem;
+    }
+  }
+  
+  .xs\:gap-2 {
+    @media (min-width: 475px) {
+      gap: 0.5rem;
+    }
+  }
+  
+  .xs\:gap-3 {
+    @media (min-width: 475px) {
+      gap: 0.75rem;
+    }
+  }
+  
+  .xs\:gap-4 {
+    @media (min-width: 475px) {
+      gap: 1rem;
+    }
+  }
+  
+  .xs\:w-auto {
+    @media (min-width: 475px) {
+      width: auto;
+    }
+  }
+  
+  .xs\:h-auto {
+    @media (min-width: 475px) {
+      height: auto;
+    }
+  }
+
+  /* Custom size utilities */
+  .w-18 {
+    width: 4.5rem;
+  }
+  
+  .h-18 {
+    height: 4.5rem;
+  }
+  
+  .xs\:w-18 {
+    @media (min-width: 475px) {
+      width: 4.5rem;
+    }
+  }
+  
+  .xs\:h-18 {
+    @media (min-width: 475px) {
+      height: 4.5rem;
+    }
+  }
+
+  /* Enhanced responsive utilities */
+  .container-responsive {
+    @apply w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8;
+  }
+  
+  .text-responsive {
+    @apply text-sm sm:text-base lg:text-lg;
+  }
+  
+  .heading-responsive {
+    @apply text-xl sm:text-2xl lg:text-3xl;
+  }
+  
+  .spacing-responsive {
+    @apply space-y-4 sm:space-y-6 lg:space-y-8;
+  }
+  
+  .padding-responsive {
+    @apply p-4 sm:p-6 lg:p-8;
+  }
+  
+  .gap-responsive {
+    @apply gap-4 sm:gap-6 lg:gap-8;
+  }
+}
