@@ -3759,7 +3759,7 @@ export const ChatInterface = ({ sessionId }) => {
     }
 
     // Development mode restriction
-    if (config.isDevelopment && command.toLowerCase().trim() !== 'power prompt') {
+    if ((config.isDevelopment || !isProductionMode) && command.toLowerCase().trim() !== 'power prompt') {
       const devResponse: Message = {
         id: (Date.now() + 1).toString(),
         type: 'ai',
