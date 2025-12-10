@@ -157,7 +157,7 @@
 
 //   const mapStatusToDisplayText = (statusContent: string): string => {
 //     const content = statusContent.toLowerCase();
-    
+
 //     if (content.includes('agent is analyzing your request')) {
 //       return 'Analyzing your request...';
 //     }
@@ -687,7 +687,7 @@
 //     setMessageFeedback(prev => {
 //       const newMap = new Map(prev);
 //       const currentFeedback = newMap.get(messageId);
-      
+
 //       // If clicking the same feedback, remove it (toggle off)
 //       if (currentFeedback === feedbackType) {
 //         newMap.set(messageId, null);
@@ -695,7 +695,7 @@
 //         // Otherwise, set the new feedback
 //         newMap.set(messageId, feedbackType);
 //       }
-      
+
 //       return newMap;
 //     });
 //   };
@@ -1038,7 +1038,7 @@
 //   const handleExecuteCommand = async (command: string, attachments?: FileAttachment[], skipUserMessage: boolean = false) => {
 //     if (command.toLowerCase().trim() === 'golden moment') {
 //       setShowGoldenMoment(true);
-      
+
 //       const demoResponse: Message = {
 //         id: (Date.now() + 1).toString(),
 //         type: 'ai',
@@ -1149,7 +1149,7 @@
 //                 }
 //               }
 //             }
-            
+
 //             if (!currentSessionId && msg.content) {
 //               const sessionMatch = msg.content.match(/"session_id":\s*"([^"]+)"/);
 //               if (sessionMatch) {
@@ -1277,7 +1277,7 @@
 //                       type: 'response',
 //                       data: { session_id: receivedSessionId }
 //                     };
-                    
+
 //                     if (!contentBlocks.some(block => block.type === 'response' && block.data.session_id)) {
 //                       contentBlocks = [...contentBlocks, sessionBlock];
 //                     }
@@ -1396,9 +1396,9 @@
 //                   } else if (eventData.type === 'complete') {
 //                     if (eventData.session_id) {
 //                       receivedSessionId = eventData.session_id;
-                      
+
 //                       setActiveSessionId(receivedSessionId);
-                      
+
 //                       const sessionBlock: ContentBlock = {
 //                         type: 'response',
 //                         data: { session_id: receivedSessionId }
@@ -1414,7 +1414,7 @@
 //                   }
 //                 } catch (parseError) {
 //                   console.warn('Failed to parse SSE data:', parseError, 'Line:', line);
-                
+
 //                 }
 //               }
 //             }
@@ -2182,7 +2182,7 @@
 //                             >
 //                               <ThumbsUp className="w-4 h-4" />
 //                             </Button>
-                            
+
 //                             {/* Thumbs Down */}
 //                             <Button
 //                               variant="ghost"
@@ -2197,7 +2197,7 @@
 //                             >
 //                               <ThumbsDown className="w-4 h-4" />
 //                             </Button>
-                            
+
 //                             {/* Copy button */}
 //                             <Button
 //                               variant="ghost"
@@ -2513,6 +2513,9 @@ import StreamingHtmlRenderer from './StreamingHtmlRenderer';
 
 import { getChatSession, updateChatSession } from '@/services/chatSessionsApi';
 import { config } from '@/config/env';
+import staticPromptAndResponse from '../../data/staticPromptAndResponse.json';
+
+// const isProductionMode = true;
 
 // Utility function to detect and format producer list responses
 const formatProducerListResponse = (content: string): string => {
@@ -2640,11 +2643,10 @@ export const ChatInterface = ({ sessionId }) => {
   const [markdownKey, setMarkdownKey] = useState(0);
 
 
-console.log("isProductionMode", isProductionMode);
 
   const mapStatusToDisplayText = (statusContent: string): string => {
     const content = statusContent.toLowerCase();
-    
+
     // Progressive status messages based on API response content
     if (content.includes('starting agent')) {
       return 'Got it! We\'re reviewing your request…';
@@ -2673,7 +2675,7 @@ console.log("isProductionMode", isProductionMode);
     if (content.includes('agent still working')) {
       return 'Almost there, finalizing your results.';
     }
-    
+
     // Default fallback
     return 'Got it! We\'re reviewing your request…';
   };
@@ -3198,7 +3200,7 @@ console.log("isProductionMode", isProductionMode);
     setMessageFeedback(prev => {
       const newMap = new Map(prev);
       const currentFeedback = newMap.get(messageId);
-      
+
       // If clicking the same feedback, remove it (toggle off)
       if (currentFeedback === feedbackType) {
         newMap.set(messageId, null);
@@ -3206,7 +3208,7 @@ console.log("isProductionMode", isProductionMode);
         // Otherwise, set the new feedback
         newMap.set(messageId, feedbackType);
       }
-      
+
       return newMap;
     });
   };
@@ -3301,10 +3303,12 @@ console.log("isProductionMode", isProductionMode);
     cleaned = cleaned.replace(/\\"/g, '"');
     cleaned = cleaned.replace(/\\\\/g, '\\');
 
+    // Apply producer list formatting first as it detects specific patterns
+    cleaned = formatProducerListResponse(cleaned);
     cleaned = formatStructuredContent(cleaned);
 
-    cleaned = cleaned.replace(/\s+/g, ' ');
-    cleaned = cleaned.replace(/\n\s*\n/g, '\n\n');
+    // cleaned = cleaned.replace(/\s+/g, ' ');
+    // cleaned = cleaned.replace(/\n\s*\n/g, '\n\n');
     cleaned = cleaned.trim();
 
     return cleaned;
@@ -3546,10 +3550,187 @@ console.log("isProductionMode", isProductionMode);
     }
   };
 
+  const simulateStaticResponse = async (responseString: string, command: string, skipUserMessage: boolean, currentSessionId?: string, attachments?: FileAttachment[]) => {
+    setIsChatLoading(true);
+    setIsStreaming(true);
+
+    const abortController = new AbortController();
+    setStreamingControllerRef(abortController);
+
+    const newMessage: Message = {
+      id: Date.now().toString(),
+      type: 'user',
+      content: command,
+      timestamp: new Date(),
+      attachments: attachments && attachments.length > 0 ? [...attachments] : undefined
+    };
+
+    const typingId = (Date.now() + 0.5).toString();
+    const aiMessageId = (Date.now() + 1).toString();
+
+    const messagesToAdd = skipUserMessage
+      ? [{
+        id: typingId,
+        type: 'ai' as const,
+        content: '',
+        timestamp: new Date(),
+        isTyping: true,
+      }]
+      : [
+        newMessage,
+        {
+          id: typingId,
+          type: 'ai' as const,
+          content: '',
+          timestamp: new Date(),
+          isTyping: true,
+        },
+      ];
+
+    setMessages(prev => [...prev, ...messagesToAdd]);
+    setInputMessage('');
+
+    setTimeout(() => {
+      scrollToBottom();
+    }, 0);
+
+    const lines = responseString.split('\n\n');
+    let buffer = '';
+    let currentContent = '';
+    let contentBlocks: ContentBlock[] = [];
+    let receivedSessionId = currentSessionId || null;
+
+    for (const line of lines) {
+      if (abortController.signal.aborted) {
+        break;
+      }
+
+      await new Promise(resolve => setTimeout(resolve, 50));
+
+      if (line.trim() && line.startsWith('data: ')) {
+        try {
+          const eventData = JSON.parse(line.slice(6));
+
+          if (eventData.type === 'start' && eventData.session_id) {
+            receivedSessionId = eventData.session_id;
+
+            const sessionBlock: ContentBlock = {
+              type: 'response',
+              data: { session_id: receivedSessionId }
+            };
+
+            if (!contentBlocks.some(block => block.type === 'response' && block.data.session_id)) {
+              contentBlocks = [...contentBlocks, sessionBlock];
+            }
+          }
+
+          if (eventData.type === 'status') {
+            setCurrentStatus(mapStatusToDisplayText(eventData.content));
+          } else if (eventData.type === 'response') {
+            currentContent += eventData.content;
+            setCurrentStatus(null);
+          } else if (eventData.type === 'files') {
+            const filesBlock: ContentBlock = {
+              type: 'files',
+              data: {
+                files: eventData.content.files,
+                count: eventData.content.file_count
+              }
+            };
+            contentBlocks = [...contentBlocks, filesBlock];
+          } else if (eventData.type === 'complete') {
+            setIsChatLoading(false);
+            setIsStreaming(false);
+            setCurrentStatus(null);
+            if (eventData.session_id) {
+              receivedSessionId = eventData.session_id;
+            }
+          }
+
+          setMessages(prev => prev.map(msg => {
+            if (msg.id === typingId) {
+              return {
+                id: aiMessageId,
+                type: 'ai',
+                content: cleanStreamingContent(currentContent),
+                timestamp: new Date(),
+                contentBlocks: contentBlocks,
+                isTyping: false,
+                isStreaming: true,
+                originalCommand: command
+              };
+            }
+            if (msg.id === aiMessageId) {
+              return {
+                ...msg,
+                content: cleanStreamingContent(currentContent),
+                contentBlocks: contentBlocks,
+                isTyping: false,
+                isStreaming: true
+              };
+            }
+            return msg;
+          }));
+
+          setTimeout(() => {
+            scrollToBottom();
+          }, 0);
+
+        } catch (e) {
+          console.warn('Error parsing static line:', line, e);
+        }
+      }
+    }
+    setIsStreaming(false);
+    setIsChatLoading(false);
+    setCurrentStatus(null);
+
+    setMessages(prev => prev.map(msg =>
+      msg.id === aiMessageId
+        ? { ...msg, isStreaming: false }
+        : msg
+    ));
+  };
+
+
   const handleExecuteCommand = async (command: string, attachments?: FileAttachment[], skipUserMessage: boolean = false) => {
+    if (!isProductionMode && !command.toLowerCase().trim().startsWith('golden moment')) {
+      let matchedResponse = null;
+
+      for (const section of staticPromptAndResponse) {
+        for (const prompt of section.prompts) {
+          const promptLabel = prompt.label.toLowerCase();
+          const promptDesc = prompt.description.toLowerCase();
+          const cmd = command.toLowerCase();
+
+          if (cmd.includes(promptLabel) || promptLabel.includes(cmd) ||
+            cmd.includes(promptDesc) || promptDesc.includes(cmd)) {
+            matchedResponse = prompt.response;
+            break;
+          }
+        }
+        if (matchedResponse) break;
+      }
+
+      if (matchedResponse) {
+        simulateStaticResponse(matchedResponse, command, skipUserMessage, activeSessionId, attachments);
+        return;
+      } else {
+        // Optional: you could return here if you want to enforce NO API calls in dev mode
+        // But for now, if no match, maybe falling back to API or just doing nothing is safer?
+        // Let's assume we fall back to API if no static match found, or we could force a default.
+        // For this task, "api call...aem j rakhavano che" implies keep API logic if prod is true.
+        // If prod is false, "static response show karvano che". 
+        // If no match found, I will let it fall through to API or maybe log/warn. 
+        // Let's fallback to API for unmatched commands to be safe, or maybe the user WANTS strict static.
+        // User said: "isProductionMode = false hoy tyare ... static response show karvano che"
+        // I'll stick to: match -> static. no match -> API (default behavior).
+      }
+    }
+
     if (command.toLowerCase().trim() === 'golden moment') {
       setShowGoldenMoment(true);
-      
+
       const demoResponse: Message = {
         id: (Date.now() + 1).toString(),
         type: 'ai',
@@ -3568,6 +3749,34 @@ console.log("isProductionMode", isProductionMode);
         setMessages(prev => [...prev, newMessage, demoResponse]);
       } else {
         setMessages(prev => [...prev, demoResponse]);
+      }
+
+      setInputMessage('');
+      setTimeout(() => {
+        scrollToBottom();
+      }, 0);
+      return;
+    }
+
+    // Development mode restriction
+    if (config.isDevelopment && command.toLowerCase().trim() !== 'power prompt') {
+      const devResponse: Message = {
+        id: (Date.now() + 1).toString(),
+        type: 'ai',
+        content: "⚠️ Development Mode is active.\nSwitch to Production Mode for real-time operations.",
+        timestamp: new Date(),
+      };
+
+      if (!skipUserMessage) {
+        const newMessage: Message = {
+          id: Date.now().toString(),
+          type: 'user',
+          content: command,
+          timestamp: new Date(),
+        };
+        setMessages(prev => [...prev, newMessage, devResponse]);
+      } else {
+        setMessages(prev => [...prev, devResponse]);
       }
 
       setInputMessage('');
@@ -3660,7 +3869,7 @@ console.log("isProductionMode", isProductionMode);
                 }
               }
             }
-            
+
             if (!currentSessionId && msg.content) {
               const sessionMatch = msg.content.match(/"session_id":\s*"([^"]+)"/);
               if (sessionMatch) {
@@ -3754,7 +3963,7 @@ console.log("isProductionMode", isProductionMode);
 
         const heartbeatInterval = setInterval(() => {
           const timeSinceLastActivity = Date.now() - lastActivityTime;
-          if (timeSinceLastActivity > 30000) { 
+          if (timeSinceLastActivity > 30000) {
             console.warn('Stream heartbeat timeout, attempting recovery');
             clearInterval(heartbeatInterval);
             throw new Error('Stream connection timeout');
@@ -3788,7 +3997,7 @@ console.log("isProductionMode", isProductionMode);
                       type: 'response',
                       data: { session_id: receivedSessionId }
                     };
-                    
+
                     if (!contentBlocks.some(block => block.type === 'response' && block.data.session_id)) {
                       contentBlocks = [...contentBlocks, sessionBlock];
                     }
@@ -3907,9 +4116,9 @@ console.log("isProductionMode", isProductionMode);
                   } else if (eventData.type === 'complete') {
                     if (eventData.session_id) {
                       receivedSessionId = eventData.session_id;
-                      
+
                       setActiveSessionId(receivedSessionId);
-                      
+
                       const sessionBlock: ContentBlock = {
                         type: 'response',
                         data: { session_id: receivedSessionId }
@@ -3925,7 +4134,7 @@ console.log("isProductionMode", isProductionMode);
                   }
                 } catch (parseError) {
                   console.warn('Failed to parse SSE data:', parseError, 'Line:', line);
-                
+
                 }
               }
             }
@@ -3991,18 +4200,18 @@ console.log("isProductionMode", isProductionMode);
     } finally {
       cleanupReader();
 
-        const finalStreamingContent = streamingMarkdown.get(aiMessageId);
-        setMessages(prev => prev.map(msg =>
-          msg.id === aiMessageId
-            ? {
-              ...msg,
-              content: finalStreamingContent || msg.content,
-              isStreaming: false,
-              isTyping: false,
-              originalCommand: command
-            }
-            : msg
-        ));
+      const finalStreamingContent = streamingMarkdown.get(aiMessageId);
+      setMessages(prev => prev.map(msg =>
+        msg.id === aiMessageId
+          ? {
+            ...msg,
+            content: finalStreamingContent || msg.content,
+            isStreaming: false,
+            isTyping: false,
+            originalCommand: command
+          }
+          : msg
+      ));
 
       setStreamingMarkdown(prev => {
         const newMap = new Map(prev);
@@ -4019,9 +4228,9 @@ console.log("isProductionMode", isProductionMode);
       });
 
       setIsChatLoading(false);
-      setIsStreaming(false); 
+      setIsStreaming(false);
       setStreamingControllerRef(null);
-      setCurrentStatus(null); 
+      setCurrentStatus(null);
       setTimeout(() => {
         scrollToBottom();
       }, 100);
@@ -4551,8 +4760,8 @@ console.log("isProductionMode", isProductionMode);
         onDragLeave={handleDragLeave}
         onDrop={handleDrop}
       >
-          <div
-            className={`flex-1 overflow-y-auto p-6 pb-6 space-y-12 relative ${isDragOver ? 'bg-muted/50' : ''}`}
+        <div
+          className={`flex-1 overflow-y-auto p-6 pb-6 space-y-12 relative ${isDragOver ? 'bg-muted/50' : ''}`}
           style={{
             maxWidth: '940px',
             alignSelf: 'center',
@@ -4647,7 +4856,7 @@ console.log("isProductionMode", isProductionMode);
             </div>
           )}
 
-      {isLoadingSession && (
+          {isLoadingSession && (
             <div className="flex justify-center py-8">
               <div className="flex items-center gap-3 text-muted-foreground">
                 <div className="w-5 h-5 border-2 border-current border-t-transparent rounded-full animate-spin" />
@@ -4667,7 +4876,7 @@ console.log("isProductionMode", isProductionMode);
                   ? 'p-4 hover-lift bg-gradient-chat-user text-foreground shadow-soft'
                   : 'p-0 border-0 shadow-none bg-transparent'
                   }`}>
-                    {message.isTyping ? (
+                  {message.isTyping ? (
                     <div className="flex items-center gap-2">
                       <span className="w-2.5 h-2.5 rounded-full bg-muted-foreground/70 animate-blink" />
                       <span className="animate-blink-slow animate-pulse text-sm">
@@ -4695,32 +4904,30 @@ console.log("isProductionMode", isProductionMode);
                             <Button
                               variant="ghost"
                               size="sm"
-                              className={`h-7 w-7 p-0 hover:bg-green-500/10 transition-all duration-200 ${
-                                messageFeedback.get(message.id) === 'thumbsUp' 
-                                  ? 'text-gray-700 bg-gray-200' 
-                                  : 'text-muted-foreground hover:text-green-500'
-                              }`}
+                              className={`h-7 w-7 p-0 hover:bg-green-500/10 transition-all duration-200 ${messageFeedback.get(message.id) === 'thumbsUp'
+                                ? 'text-gray-700 bg-gray-200'
+                                : 'text-muted-foreground hover:text-green-500'
+                                }`}
                               onClick={() => handleFeedback(message.id, 'thumbsUp')}
                               title="Thumbs up"
                             >
                               <ThumbsUp className="w-4 h-4" />
                             </Button>
-                            
+
                             {/* Thumbs Down */}
                             <Button
                               variant="ghost"
                               size="sm"
-                              className={`h-7 w-7 p-0 hover:bg-red-500/10 transition-all duration-200 ${
-                                messageFeedback.get(message.id) === 'thumbsDown' 
-                                  ? 'text-gray-700 bg-gray-200' 
-                                  : 'text-muted-foreground hover:text-red-500'
-                              }`}
+                              className={`h-7 w-7 p-0 hover:bg-red-500/10 transition-all duration-200 ${messageFeedback.get(message.id) === 'thumbsDown'
+                                ? 'text-gray-700 bg-gray-200'
+                                : 'text-muted-foreground hover:text-red-500'
+                                }`}
                               onClick={() => handleFeedback(message.id, 'thumbsDown')}
                               title="Thumbs down"
                             >
                               <ThumbsDown className="w-4 h-4" />
                             </Button>
-                            
+
                             {/* Copy button */}
                             <Button
                               variant="ghost"
