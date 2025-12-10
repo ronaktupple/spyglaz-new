@@ -2486,6 +2486,7 @@ import { Card } from '@/components/ui/card';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Textarea } from '@/components/ui/textarea';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
+import { Switch } from '@/components/ui/switch';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/hooks/useAuth';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
@@ -2631,11 +2632,15 @@ export const ChatInterface = ({ sessionId }) => {
   const [isAtTop, setIsAtTop] = useState(true);
   const [isAtBottom, setIsAtBottom] = useState(false);
   const [isActionPromptsSidebarOpen, setIsActionPromptsSidebarOpen] = useState(false);
+  const [isProductionMode, setIsProductionMode] = useState(false);
   const [isChatLoading, setIsChatLoading] = useState(false);
   const [isStreaming, setIsStreaming] = useState(false);
   const [streamingControllerRef, setStreamingControllerRef] = useState<AbortController | null>(null);
   const [currentStatus, setCurrentStatus] = useState<string | null>(null);
   const [markdownKey, setMarkdownKey] = useState(0);
+
+
+console.log("isProductionMode", isProductionMode);
 
   const mapStatusToDisplayText = (statusContent: string): string => {
     const content = statusContent.toLowerCase();
@@ -4491,28 +4496,40 @@ export const ChatInterface = ({ sessionId }) => {
             </DropdownMenuContent>
           </DropdownMenu>
 
-      <Sheet open={isActionPromptsSidebarOpen} onOpenChange={setIsActionPromptsSidebarOpen}>
-            <SheetTrigger asChild>
-              <Button
-                variant="outline"
-                size="sm"
-                className="gap-2 h-8 px-3 rounded-full border border-border hover:border-primary/50 transition-all duration-200"
-              >
-                <Zap className="w-4 h-4" />
-                <span className="text-sm">Power Prompts</span>
-              </Button>
-            </SheetTrigger>
+          <div className="flex items-center gap-3">
+            <Sheet open={isActionPromptsSidebarOpen} onOpenChange={setIsActionPromptsSidebarOpen}>
+              <SheetTrigger asChild>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="gap-2 h-8 px-3 rounded-full border border-border hover:border-primary/50 transition-all duration-200"
+                >
+                  <Zap className="w-4 h-4" />
+                  <span className="text-sm">Power Prompts</span>
+                </Button>
+              </SheetTrigger>
 
-            <SheetContent side="right" className="w-[30rem] max-w-[30rem] min-w-[30rem] p-0">
-              <ActionPromptsSidebar
-                showWelcome={!hasSeenActionPrompts}
-                onPromptClick={(prompt) => {
-                  setInputMessage(prompt);
-                  setIsActionPromptsSidebarOpen(false);
-                }}
+              <SheetContent side="right" className="w-[30rem] max-w-[30rem] min-w-[30rem] p-0">
+                <ActionPromptsSidebar
+                  showWelcome={!hasSeenActionPrompts}
+                  onPromptClick={(prompt) => {
+                    setInputMessage(prompt);
+                    setIsActionPromptsSidebarOpen(false);
+                  }}
+                />
+              </SheetContent>
+            </Sheet>
+
+            <div className="flex items-center gap-2 w-[178px]">
+              <Switch
+                checked={isProductionMode}
+                onCheckedChange={setIsProductionMode}
               />
-            </SheetContent>
-          </Sheet>
+              <span className="text-sm text-muted-foreground">
+                {isProductionMode ? 'Production Mode' : 'Development Mode'}
+              </span>
+            </div>
+          </div>
         </div>
       </div>
 
