@@ -3763,7 +3763,7 @@ export const ChatInterface = ({ sessionId }) => {
       const devResponse: Message = {
         id: (Date.now() + 1).toString(),
         type: 'ai',
-        content: "⚠️ Development Mode is active.\nSwitch to Production Mode for real-time operations.",
+        content: "⚠️ Development Mode is active.\nSwitch to Production Mode for real-time operations...",
         timestamp: new Date(),
       };
 
