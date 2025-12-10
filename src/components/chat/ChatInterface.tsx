@@ -3763,7 +3763,7 @@ export const ChatInterface = ({ sessionId }) => {
       const devResponse: Message = {
         id: (Date.now() + 1).toString(),
         type: 'ai',
-        content: "⚠️ Development Mode is active.\nSwitch to Production Mode for real-time operations...",
+        content: "⚠️ Development Mode is active.\nSwitch to Production Mode for real-time operations.",
         timestamp: new Date(),
       };
 
@@ -4714,7 +4714,7 @@ export const ChatInterface = ({ sessionId }) => {
                   className="gap-2 h-8 px-3 rounded-full border border-border hover:border-primary/50 transition-all duration-200"
                 >
                   <Zap className="w-4 h-4" />
-                  <span className="text-sm">Power Prompts 1</span>
+                  <span className="text-sm">Power Prompts</span>
                 </Button>
               </SheetTrigger>
 
