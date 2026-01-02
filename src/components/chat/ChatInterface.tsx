@@ -2611,6 +2611,7 @@ interface Message {
   isStreaming?: boolean;
   attachments?: FileAttachment[];
   originalCommand?: string;
+  chips?: string[];
 }
 
 interface ContentBlock {
@@ -3550,7 +3551,7 @@ export const ChatInterface = ({ sessionId }) => {
     }
   };
 
-  const simulateStaticResponse = async (responseString: string, command: string, skipUserMessage: boolean, currentSessionId?: string, attachments?: FileAttachment[]) => {
+  const simulateStaticResponse = async (responseString: string, command: string, skipUserMessage: boolean, currentSessionId?: string, attachments?: FileAttachment[], chips?: string[]) => {
     setIsChatLoading(true);
     setIsStreaming(true);
 
@@ -3657,7 +3658,8 @@ export const ChatInterface = ({ sessionId }) => {
                 contentBlocks: contentBlocks,
                 isTyping: false,
                 isStreaming: true,
-                originalCommand: command
+                originalCommand: command,
+                chips: chips || undefined
               };
             }
             if (msg.id === aiMessageId) {
@@ -3666,7 +3668,8 @@ export const ChatInterface = ({ sessionId }) => {
                 content: cleanStreamingContent(currentContent),
                 contentBlocks: contentBlocks,
                 isTyping: false,
-                isStreaming: true
+                isStreaming: true,
+                chips: chips || undefined
               };
             }
             return msg;
@@ -3687,7 +3690,7 @@ export const ChatInterface = ({ sessionId }) => {
 
     setMessages(prev => prev.map(msg =>
       msg.id === aiMessageId
-        ? { ...msg, isStreaming: false }
+        ? { ...msg, isStreaming: false, chips: chips || undefined }
         : msg
     ));
   };
@@ -3696,24 +3699,59 @@ export const ChatInterface = ({ sessionId }) => {
   const handleExecuteCommand = async (command: string, attachments?: FileAttachment[], skipUserMessage: boolean = false) => {
     if (!isProductionMode && !command.toLowerCase().trim().startsWith('golden moment')) {
       let matchedResponse = null;
+      let matchedChips = null;
 
+      // First pass: Look for exact or very close matches
+      let exactMatch = null;
+      let exactMatchChips = null;
+      const cmd = command.toLowerCase().trim();
+      
       for (const section of staticPromptAndResponse) {
         for (const prompt of section.prompts) {
-          const promptLabel = prompt.label.toLowerCase();
-          const promptDesc = prompt.description.toLowerCase();
-          const cmd = command.toLowerCase();
+          const promptLabel = prompt.label.toLowerCase().trim();
+          const promptDesc = prompt.description.toLowerCase().trim();
 
-          if (cmd.includes(promptLabel) || promptLabel.includes(cmd) ||
-            cmd.includes(promptDesc) || promptDesc.includes(cmd)) {
-            matchedResponse = prompt.response;
+          // Check for exact match or very close match (90% similarity)
+          if (cmd === promptDesc || cmd === promptLabel) {
+            exactMatch = prompt.response;
+            exactMatchChips = prompt.chips || null;
+            break;
+          }
+          // Check if command starts with description or vice versa (for partial matches)
+          if (cmd.startsWith(promptDesc) || promptDesc.startsWith(cmd) ||
+              cmd.startsWith(promptLabel) || promptLabel.startsWith(cmd)) {
+            exactMatch = prompt.response;
+            exactMatchChips = prompt.chips || null;
             break;
           }
         }
-        if (matchedResponse) break;
+        if (exactMatch) break;
+      }
+
+      // If exact match found, use it
+      if (exactMatch) {
+        matchedResponse = exactMatch;
+        matchedChips = exactMatchChips;
+      } else {
+        // Second pass: Look for partial matches (fallback)
+        for (const section of staticPromptAndResponse) {
+          for (const prompt of section.prompts) {
+            const promptLabel = prompt.label.toLowerCase().trim();
+            const promptDesc = prompt.description.toLowerCase().trim();
+
+            if (cmd.includes(promptLabel) || promptLabel.includes(cmd) ||
+              cmd.includes(promptDesc) || promptDesc.includes(cmd)) {
+              matchedResponse = prompt.response;
+              matchedChips = prompt.chips || null;
+              break;
+            }
+          }
+          if (matchedResponse) break;
+        }
       }
 
       if (matchedResponse) {
-        simulateStaticResponse(matchedResponse, command, skipUserMessage, activeSessionId, attachments);
+        simulateStaticResponse(matchedResponse, command, skipUserMessage, activeSessionId, attachments, matchedChips);
         return;
       } else {
         // Optional: you could return here if you want to enforce NO API calls in dev mode
@@ -3758,8 +3796,8 @@ export const ChatInterface = ({ sessionId }) => {
       return;
     }
 
-    // Development mode restriction
-    if ((config.isDevelopment || !isProductionMode) && command.toLowerCase().trim() !== 'power prompt') {
+    // Development mode restriction - only check UI toggle, not build environment
+    if (!isProductionMode && command.toLowerCase().trim() !== 'power prompt') {
       const devResponse: Message = {
         id: (Date.now() + 1).toString(),
         type: 'ai',
@@ -4998,6 +5036,25 @@ export const ChatInterface = ({ sessionId }) => {
                     {renderContentBlock(block)}
                   </div>
                 ))}
+
+                {/* Render chips if any */}
+                {message.chips && message.chips.length > 0 && !message.isStreaming && (
+                  <div className="mt-4 flex flex-wrap gap-2">
+                    {message.chips.map((chip, index) => (
+                      <Button
+                        key={index}
+                        variant="outline"
+                        size="sm"
+                        className="h-8 text-xs rounded-full border border-border/40 hover:border-border transition-all duration-200 px-3 bg-muted/50 hover:bg-muted"
+                        onClick={() => {
+                          handleExecuteCommand(chip, undefined, false);
+                        }}
+                      >
+                        {chip}
+                      </Button>
+                    ))}
+                  </div>
+                )}
 
                 {/* Render attachments if any */}
                 {message.attachments && message.attachments.length > 0 && (

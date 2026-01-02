@@ -10,7 +10,7 @@ import { Input } from '@/components/ui/input';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { useAppSelector } from '@/store/hooks';
 import { ThemeToggle } from '@/components/ui/theme-toggle';
-import { Plus, MessageSquare, TrendingUp, Users, Mail, Calendar, Filter, Bot, Search, Library, FileText, BookOpen, Archive, BarChart3, PieChart, Download, Image, FileSpreadsheet, MessageCircle, MoreHorizontal, Share, Edit, Trash2 } from 'lucide-react';
+import { Plus, MessageSquare, TrendingUp, Users, Mail, Calendar, Filter, Bot, Search, Library, FileText, BookOpen, Archive, BarChart3, PieChart, Download, Image, FileSpreadsheet, MessageCircle, MoreHorizontal, Share, Edit, Trash2, Sparkles } from 'lucide-react';
 import { useTheme } from 'next-themes';
 import logo from '@/assets/logo.svg';
 import logoDark from '@/assets/logo-dark.svg';
@@ -74,7 +74,7 @@ export const Sidebar = ({ selectedSessionId }) => {
   useEffect(() => {
     const fetchChatSessions = async () => {
       if (!isAuthenticated) return;
-      
+
       setLoading(true);
       setError(null);
       try {
@@ -96,7 +96,7 @@ export const Sidebar = ({ selectedSessionId }) => {
     const date = new Date(timestamp);
     const now = new Date();
     const diffInHours = Math.floor((now.getTime() - date.getTime()) / (1000 * 60 * 60));
-    
+
     if (diffInHours < 1) return 'Just now';
     if (diffInHours < 24) return `${diffInHours} hour${diffInHours > 1 ? 's' : ''} ago`;
     if (diffInHours < 48) return 'Yesterday';
@@ -115,7 +115,7 @@ export const Sidebar = ({ selectedSessionId }) => {
       const today = new Date();
       const yesterday = new Date(today);
       yesterday.setDate(yesterday.getDate() - 1);
-      
+
       let groupKey: string;
       if (date.toDateString() === today.toDateString()) {
         groupKey = 'Today';
@@ -124,13 +124,13 @@ export const Sidebar = ({ selectedSessionId }) => {
       } else {
         groupKey = 'Earlier';
       }
-      
+
       if (!groups[groupKey]) {
         groups[groupKey] = [];
       }
       groups[groupKey].push(session);
     });
-    
+
     return groups;
   };
 
@@ -151,7 +151,7 @@ export const Sidebar = ({ selectedSessionId }) => {
       }
       return null;
     }
-    
+
     // If we have a selectedSessionId, find it in the existing sessions
     return chatSessions.find(session => session.session_id === selectedSessionId) || null;
   };
@@ -166,7 +166,7 @@ export const Sidebar = ({ selectedSessionId }) => {
     setChatSessions(prev => prev.map(s => ({ ...s, active: s.session_id === sessionId })));
     navigate(`/chat/${sessionId}`);
     setIsSearchDialogOpen(false);
-    setSearchQuery(''); 
+    setSearchQuery('');
   };
 
   // Handle new chat
@@ -176,9 +176,9 @@ export const Sidebar = ({ selectedSessionId }) => {
     sessionStorage.removeItem('current-session'); // Clear sessionStorage
     navigate('/');
     setSearchQuery('');
-    
+
     window.dispatchEvent(new Event('stop-streaming'));
-    
+
     window.dispatchEvent(new Event('start-new-chat'));
     sessionStorage.setItem('start-new-chat', '1');
   };
@@ -200,7 +200,7 @@ export const Sidebar = ({ selectedSessionId }) => {
   const handleConversationAction = (action: string, session: ChatSession) => {
     setSelectedConversation(session);
     setRenameValue(session.title);
-    
+
     switch (action) {
       case 'share':
         console.log('Sharing conversation:', session.title);
@@ -222,10 +222,10 @@ export const Sidebar = ({ selectedSessionId }) => {
       setIsRenaming(true);
       try {
         const response = await updateChatSession(selectedConversation.session_id, renameValue.trim());
-        
+
         if (response.success) {
-          setChatSessions(prev => prev.map(s => 
-            s.session_id === selectedConversation.session_id 
+          setChatSessions(prev => prev.map(s =>
+            s.session_id === selectedConversation.session_id
               ? { ...s, title: renameValue.trim() }
               : s
           ));
@@ -248,12 +248,12 @@ export const Sidebar = ({ selectedSessionId }) => {
       setIsDeleting(true);
       try {
         const response = await deleteChatSession(selectedConversation.session_id);
-        
+
         if (response.success) {
           setChatSessions(prev => prev.filter(s => s.session_id !== selectedConversation.session_id));
           setIsDeleteModalOpen(false);
           setSelectedConversation(null);
-        
+
           if (selectedConversation.active) {
             navigate('/');
           }
@@ -301,20 +301,20 @@ export const Sidebar = ({ selectedSessionId }) => {
         });
       }
     };
-    
+
     const handleSessionUpdated = (event: CustomEvent) => {
       const updatedSession = event.detail;
       if (updatedSession) {
         setCurrentSession(updatedSession);
         // Replace temporary session with real session
         setChatSessions(prev => {
-          return prev.map(session => 
+          return prev.map(session =>
             session.isTemporary ? updatedSession : session
           ).filter(session => !session.isTemporary);
         });
       }
     };
-    
+
     window.addEventListener('open-sample-chat', handleOpen as EventListener);
     window.addEventListener('start-new-chat', handleNew as EventListener);
     window.addEventListener('refresh-chat-sessions', handleRefresh as EventListener);
@@ -345,7 +345,7 @@ export const Sidebar = ({ selectedSessionId }) => {
                   <AvatarImage src={user.avatar} alt={user.username} />
                   <AvatarFallback className="bg-gradient-primary text-primary-foreground text-xs">
                     {/* {user.username ? user.username.split(' ').map(n => n[0]).join('') : user.username?.charAt(0)?.toUpperCase() || 'U'} */}
-                   TQ
+                    TQ
                   </AvatarFallback>
                 </Avatar>
               </Link>
@@ -382,8 +382,8 @@ export const Sidebar = ({ selectedSessionId }) => {
                     <h4 className="text-xs font-medium text-muted-foreground mb-2">{dateGroup}</h4>
                     <div className="space-y-1">
                       {sessions.map((session) => (
-                        <div 
-                          key={session.session_id} 
+                        <div
+                          key={session.session_id}
                           className="flex items-center gap-3 px-2 py-2 rounded-md hover:bg-muted/50 cursor-pointer group"
                           onClick={() => handleSessionSelect(session.session_id)}
                         >
@@ -462,13 +462,29 @@ export const Sidebar = ({ selectedSessionId }) => {
             </SheetContent>
           </Sheet>
 
-          <Button 
-            className="w-full justify-start hover:bg-foreground/5 transition-colors" 
+          <Button
+            className="w-full justify-start hover:bg-foreground/5 transition-colors"
             variant="ghost"
             onClick={() => navigate('/audit-layer')}
           >
             <FileSpreadsheet className="w-4 h-4 mr-3" />
             Audit Layer
+          </Button>
+          <Button
+            className="w-full justify-start hover:bg-foreground/5 transition-colors"
+            variant="ghost"
+            onClick={() => window.open('https://spyglazproducerconnect.replit.app/lifepath', '_blank')}
+          >
+            <Sparkles className="w-4 h-4 mr-3" />
+            LifePath
+          </Button>
+          <Button
+            className="w-full justify-start hover:bg-foreground/5 transition-colors"
+            variant="ghost"
+            onClick={() => window.open('https://spyglazproducerconnect.replit.app/platform-xk9m2p7n4q8w5t', '_blank')}
+          >
+            <Users className="w-4 h-4 mr-3" />
+            Producer Connect
           </Button>
         </div>
       </div>
@@ -555,7 +571,7 @@ export const Sidebar = ({ selectedSessionId }) => {
                   </div>
                 </div>
               )} */}
-              
+
               {/* Regular Sessions */}
               {Object.entries(groupedSessions).map(([dateGroup, sessions]) => (
                 <div key={dateGroup} className="mb-4">
@@ -620,7 +636,7 @@ export const Sidebar = ({ selectedSessionId }) => {
                                 <Archive className="mr-2 h-4 w-4" />
                                 Archive
                               </DropdownMenuItem> */}
-                              <DropdownMenuItem 
+                              <DropdownMenuItem
                                 onClick={() => handleConversationAction('delete', session)}
                                 className="text-destructive focus:text-destructive"
                               >
@@ -645,82 +661,82 @@ export const Sidebar = ({ selectedSessionId }) => {
         <img src={theme === 'dark' ? logoDark : logo} alt="Spyglaz Logo" className="h-8 w-auto" />
       </div>
 
-             {/* Conversation Actions Modal */}
-       <Dialog open={isConversationActionsOpen} onOpenChange={setIsConversationActionsOpen}>
-         <DialogContent className="sm:max-w-[425px]">
-           <DialogHeader>
-             <DialogTitle>Rename Conversation</DialogTitle>
-           </DialogHeader>
-           <div className="grid gap-4 py-4">
-             <div className="grid gap-2">
-               <label htmlFor="name" className="text-sm font-medium">
-                 Conversation Name
-               </label>
-               <Input
-                 id="name"
-                 value={renameValue}
-                 onChange={(e) => setRenameValue(e.target.value)}
-                 placeholder="Enter conversation name"
-                 onKeyDown={(e) => {
-                   if (e.key === 'Enter') {
-                     handleRename();
-                   }
-                 }}
-               />
-             </div>
-           </div>
-           <div className="flex justify-end gap-3">
-             <Button
-               variant="outline"
-               onClick={() => {
-                 setIsConversationActionsOpen(false);
-                 setSelectedConversation(null);
-                 setRenameValue('');
-               }}
-             >
-               Cancel
-             </Button>
-             <Button onClick={handleRename} disabled={isRenaming}>
-               {isRenaming ? 'Saving...' : 'Save'}
-             </Button>
-           </div>
-         </DialogContent>
-       </Dialog>
+      {/* Conversation Actions Modal */}
+      <Dialog open={isConversationActionsOpen} onOpenChange={setIsConversationActionsOpen}>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle>Rename Conversation</DialogTitle>
+          </DialogHeader>
+          <div className="grid gap-4 py-4">
+            <div className="grid gap-2">
+              <label htmlFor="name" className="text-sm font-medium">
+                Conversation Name
+              </label>
+              <Input
+                id="name"
+                value={renameValue}
+                onChange={(e) => setRenameValue(e.target.value)}
+                placeholder="Enter conversation name"
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') {
+                    handleRename();
+                  }
+                }}
+              />
+            </div>
+          </div>
+          <div className="flex justify-end gap-3">
+            <Button
+              variant="outline"
+              onClick={() => {
+                setIsConversationActionsOpen(false);
+                setSelectedConversation(null);
+                setRenameValue('');
+              }}
+            >
+              Cancel
+            </Button>
+            <Button onClick={handleRename} disabled={isRenaming}>
+              {isRenaming ? 'Saving...' : 'Save'}
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
 
-       {/* Delete Confirmation Modal */}
-       <Dialog open={isDeleteModalOpen} onOpenChange={setIsDeleteModalOpen}>
-         <DialogContent className="sm:max-w-[425px]">
-           <DialogHeader>
-             <DialogTitle>Delete chat?</DialogTitle>
-           </DialogHeader>
-           <div className="py-4">
-             <p className="text-sm text-muted-foreground">
-               This will delete <strong>{selectedConversation?.title}</strong>.
-             </p>
-             <p className="text-sm text-muted-foreground mt-2">
-               Visit <span className="underline cursor-pointer">settings</span> to delete any memories saved during this chat.
-             </p>
-           </div>
-           <div className="flex justify-end gap-3">
-             <Button
-               variant="outline"
-               onClick={() => {
-                 setIsDeleteModalOpen(false);
-                 setSelectedConversation(null);
-               }}
-             >
-               Cancel
-             </Button>
-             <Button 
-               variant="destructive" 
-               onClick={handleDelete} 
-               disabled={isDeleting}
-             >
-               {isDeleting ? 'Deleting...' : 'Delete'}
-             </Button>
-           </div>
-         </DialogContent>
-       </Dialog>
+      {/* Delete Confirmation Modal */}
+      <Dialog open={isDeleteModalOpen} onOpenChange={setIsDeleteModalOpen}>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle>Delete chat?</DialogTitle>
+          </DialogHeader>
+          <div className="py-4">
+            <p className="text-sm text-muted-foreground">
+              This will delete <strong>{selectedConversation?.title}</strong>.
+            </p>
+            <p className="text-sm text-muted-foreground mt-2">
+              Visit <span className="underline cursor-pointer">settings</span> to delete any memories saved during this chat.
+            </p>
+          </div>
+          <div className="flex justify-end gap-3">
+            <Button
+              variant="outline"
+              onClick={() => {
+                setIsDeleteModalOpen(false);
+                setSelectedConversation(null);
+              }}
+            >
+              Cancel
+            </Button>
+            <Button
+              variant="destructive"
+              onClick={handleDelete}
+              disabled={isDeleting}
+            >
+              {isDeleting ? 'Deleting...' : 'Delete'}
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
